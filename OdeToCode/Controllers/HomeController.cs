@@ -1,15 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using OdeToCode.Models;
+using OdeToCode.Services;
 
 namespace OdeToCode.Controllers
 {
-    public class HomeController
+    public class HomeController : Controller
     {
-        public string Index()
+        private IRestaurantData _restaurantData;
+
+        public HomeController(IRestaurantData restaurantData)
         {
-            return "Hello from controller";
+            _restaurantData = restaurantData;
+        }
+        public IActionResult Index()
+        {
+            //List<string> List = new List<string>
+            //{
+            //    "Manpreet",
+            //    "Singh"
+            //};
+            //return "Hello from controller";
+            //return new ObjectResult(List);
+
+            Restaurant model = new Restaurant()
+            {
+                ID = 1,
+                Name = "Goodness Gracious"
+            };
+            return View(_restaurantData.GetAll());
         }
     }
 }
