@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using OdeToCode.Services;
 
 namespace OdeToCode
 {
@@ -26,16 +27,20 @@ namespace OdeToCode
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-            
+
+            //For AddSingleton services there is only ONE instance of services throughout the app.
             services.AddSingleton(Configuration);
             services.AddSingleton<IGreeter, Greeter>();
+
+            //scoped services are instanciated every time with a new HTTP request.
+            services.AddScoped<IRestaurantData, InMemoryRestaurantData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         //order of the middleware is important.
         public void Configure(
-            IApplicationBuilder app, 
-            IHostingEnvironment env, 
+            IApplicationBuilder app,
+            IHostingEnvironment env,
             ILoggerFactory loggerFactory,
             IGreeter greeter)
         {
@@ -61,7 +66,13 @@ namespace OdeToCode
             app.UseFileServer();
 
 
-            app.UseMvcWithDefaultRoute();
+            //app.UseMvcWithDefaultRoute();
+
+            app.UseMvc(route =>
+                route.MapRoute("Default", "{Controller=Home}/{Action=Index}/{id?}")
+            );
+
+            app.Run(ctx => ctx.Response.WriteAsync("Opps!!"));
 
             /*
             //this middleware will respond to "/Welcome" route .any other route will be routed to RUN middleware.
